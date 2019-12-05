@@ -146,11 +146,11 @@ def calc_tr_new():
 
 # %%
 #Integrate z, trapezoid rule eq 20
-def calc_tr():
+""" def calc_tr():
     global xi,yi,tr,expdist,z,wght,Nx,Ny
     for xi in range(0,Nx): 
         for yi in range(0,Ny):
-            tr[xi,yi]=np.sum(expdist[Nx-1-xi:2*Nx-1-xi,Ny-1-yi:2*Ny-1-yi]*z[:,:]*wght[:,:])
+            tr[xi,yi]=np.sum(expdist[Nx-1-xi:2*Nx-1-xi,Ny-1-yi:2*Ny-1-yi]*z[:,:]*wght[:,:]) """
 
 
 # %%
@@ -181,7 +181,7 @@ cs = plt.contourf(X, Y, tr, levels=np.linspace(tr.min(),tr.max(),1000),cmap=cm.P
 # The 'extend' kwarg does not work yet with a log scale.
 
 cbar = plt.colorbar()
-#plt.scatter(track[0:1999,0],track[0:1999,1])
+plt.scatter(track[0:1999,0],track[0:1999,1])
 plt.show()
 
 
@@ -240,7 +240,7 @@ plt.show()
 # %%
 def calc_path():
     global pos,vel,intens,track,dest,dvel,tau;
-#    for i in range(0,399):
+    #    for i in range(0,399):
     i=0
     hist=10
     samp=10
@@ -306,10 +306,6 @@ for i in range(0,2):
 
 
 # %%
-precision=1.
-
-
-# %%
 plot_path()
 
 
@@ -320,9 +316,6 @@ for i in range(0,Nx):
             print (i,j,g_max[i,j],pic[i,j,0])
         
 
-
 # %%
 g_nat[:,:]-pic[:,:,0]
-
-# %%
 z.dtype
