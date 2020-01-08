@@ -171,7 +171,7 @@ track
 
 # Automatic selection of levels works; setting the
 # log locator tells contourf to use a log scale
-cs = plt.contourf(X, Y, TrailPotential, levels=np.linspace(TrailPotential.min(),TrailPotential.max(),1000),cmap='cm.PuBu_r')
+cs = plt.contourf(X, Y, TrailPotential, levels=np.linspace(TrailPotential.min(),TrailPotential.max(),1000),cmap='PuBu_r')
 
 # Alternatively, you can manually set the levels
 # and the norm:
@@ -233,7 +233,7 @@ def setup_potentials():
 #Plot the direction
 scgrad=np.arctan2(grad[1],grad[0])
 levels = np.linspace(-np.pi, np.pi, 360)
-cs = plt.contourf(X, Y,scgrad, levels=levels,cmap='cm.hsv')
+cs = plt.contourf(X, Y,scgrad, levels=levels,cmap='hsv')
 
 cbar = plt.colorbar()
 plt.scatter(track[0:1999,0],track[0:1999,1])
@@ -288,10 +288,11 @@ def update_ground():
 
 # %%
 def plot_path():
-    cs = plt.contourf(X, Y, z, levels=np.linspace(z.min(),z.max(),1000),cmap='cm.PuBu_r')
+    cs = plt.contourf(X, Y, z, levels=np.linspace(z.min(),z.max(),1000),cmap=cm.PuBu_r)
     cbar = plt.colorbar()
+    plt.scatter(track[0:1999,0],track[0:1999,1],1)
     plt.show
-    plt.scatter(track[0:1999,0],track[0:1999,1])
+    
 
 
 # %%
