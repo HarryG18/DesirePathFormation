@@ -171,7 +171,7 @@ track
 
 # Automatic selection of levels works; setting the
 # log locator tells contourf to use a log scale
-cs = plt.contourf(X, Y, TrailPotential, levels=np.linspace(TrailPotential.min(),TrailPotential.max(),1000),cmap=cm.PuBu_r)
+cs = plt.contourf(X, Y, TrailPotential, levels=np.linspace(TrailPotential.min(),TrailPotential.max(),1000),cmap='cm.PuBu_r')
 
 # Alternatively, you can manually set the levels
 # and the norm:
@@ -233,7 +233,7 @@ def setup_potentials():
 #Plot the direction
 scgrad=np.arctan2(grad[1],grad[0])
 levels = np.linspace(-np.pi, np.pi, 360)
-cs = plt.contourf(X, Y,scgrad, levels=levels,cmap=cm.hsv)
+cs = plt.contourf(X, Y,scgrad, levels=levels,cmap='cm.hsv')
 
 cbar = plt.colorbar()
 plt.scatter(track[0:1999,0],track[0:1999,1])
@@ -242,7 +242,7 @@ plt.show()
 
 # %%
 def calc_path():
-    global pos,vel,intens,track,dest,dvel,tau;
+    global pos,vel,intens,track,dest,dvel,tau
     #    for i in range(0,399):
     i=0
     hist=10
@@ -253,7 +253,7 @@ def calc_path():
         pos+=dt*vel
         if (i%samp==0): avpos[:,(i%hist)//samp]=pos[:]
         gradmagnitude=max(0.0001,np.sqrt(desdirx(pos[0],pos[1])**2+desdiry(pos[0],pos[1])**2))
-        xi=np.array(np.random.normal(0,1,2))
+        #xi=np.array(np.random.normal(0,1,2))
         vel[0]+=-1/tau*vel[0]+desdirx(pos[0],pos[1])/gradmagnitude
         vel[1]+=-1/tau*vel[1]+desdiry(pos[0],pos[1])/gradmagnitude
         #vel[0]+=-1/tau*vel[0]+(dvel/tau)*desdirx(pos[0],pos[1])/gradmagnitude+np.sqrt(2.*eps/tau)*xi[0]
@@ -288,7 +288,7 @@ def update_ground():
 
 # %%
 def plot_path():
-    cs = plt.contourf(X, Y, z, levels=np.linspace(z.min(),z.max(),1000),cmap=cm.PuBu_r)
+    cs = plt.contourf(X, Y, z, levels=np.linspace(z.min(),z.max(),1000),cmap='cm.PuBu_r')
     cbar = plt.colorbar()
     plt.show
     plt.scatter(track[0:1999,0],track[0:1999,1])
