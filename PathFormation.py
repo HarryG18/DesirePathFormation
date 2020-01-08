@@ -5,6 +5,7 @@ from IPython import get_ipython
 #Initialisation
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mmlab
+
 import numpy as np
 from scipy.integrate import simps
 from scipy import signal as sg
@@ -20,13 +21,13 @@ from PIL import Image
 #%% 
 # Read grids from image
 im = Image.open("cc_fin.bmp")
-pic = np.array(im)
+Base = np.array(im)
 
 
 # %%
 scale = 0.25 #m per pixel
-Nx = pic[:,0,0].size #N appears to be resolution
-Ny = pic[0,:,0].size
+Nx = Base[:,0,0].size #N appears to be resolution
+Ny = Base[0,:,0].size
 xmin=-scale*0.5*(Nx-1)
 xmax=scale*0.5*(Nx-1)
 ymin=-scale*0.5*(Ny-1)
@@ -34,9 +35,9 @@ ymax=scale*0.5*(Ny-1)
 x = np.linspace(xmin, xmax, Nx) # This is defining the axes and full space
 y = np.linspace(ymin, ymax, Ny)
 Y, X= np.meshgrid(y, x)
-tr = np.zeros((Nx,Ny))
-destp=np.zeros((Nx,Ny))
-wght=np.zeros((Nx,Ny))
+TrailPotential = np.zeros((Nx,Ny))
+DestinationPotential=np.zeros((Nx,Ny))
+Weight=np.zeros((Nx,Ny))
 intens=np.zeros((Nx,Ny))
 q_alpha=np.zeros((Nx,Ny))
 expdist=np.zeros((2*Nx-1,2*Ny-1))
@@ -70,11 +71,11 @@ z = np.zeros((Nx,Ny))
 g_max=np.zeros((Nx,Ny))
 g_nat=np.zeros((Nx,Ny))
 
-g_nat=np.maximum(np.ones_like(g_nat),np.float64(pic[:,:,0]))
-g_max=np.maximum(np.ones_like(g_max),np.float64(pic[:,:,1]))
+g_nat=np.maximum(np.ones_like(g_nat),np.float64(Base[:,:,0]))
+g_max=np.maximum(np.ones_like(g_max),np.float64(Base[:,:,1]))
 z=g_nat
 
-track_labels=pic[:,:,2];
+track_labels=Base[:,:,2]
 
 numpoints=np.max(track_labels)
 
@@ -113,11 +114,11 @@ route=np.array([[[-2.5,14.],[24.,-9.75]],
 
 # %%
 #Setup weight matrix, here trapezoid rule.
-wght[:,:]=1
-wght[1:-1,:]=2
-wght[:,1:-1]=2
-wght[1:-1,1:-1]=4
-wght*=0.25*((x[-1]-x[0])/(Nx-1))*((y[-1]-y[0])/(Ny-1))
+Weight[:,:]=1
+Weight[1:-1,:]=2
+Weight[:,1:-1]=2
+Weight[1:-1,1:-1]=4
+Weight*=0.25*((x[-1]-x[0])/(Nx-1))*((y[-1]-y[0])/(Ny-1))
 #0.25*((x[-1]-x[0])/(N-1))*((y[-1]-y[0])/(N-1))
 #np.exp(-np.sqrt((x[:,None]-x[N/2])**2+(y[None,:]-y[N/2])**2))*z[:,:]
 
@@ -141,16 +142,16 @@ subexpdist.shape
 
 # %%
 def calc_tr_new():
-    tr[:,:]=sg.convolve2d(z[:,:]*wght[:,:],subexpdist[:,:],mode="same")
+    TrailPotential[:,:]=sg.convolve2d(z[:,:]*Weight[:,:],subexpdist[:,:],mode="same")
 
 
 # %%
 #Integrate z, trapezoid rule eq 20
-""" def calc_tr():
-    global xi,yi,tr,expdist,z,wght,Nx,Ny
-    for xi in range(0,Nx): 
-        for yi in range(0,Ny):
-            tr[xi,yi]=np.sum(expdist[Nx-1-xi:2*Nx-1-xi,Ny-1-yi:2*Ny-1-yi]*z[:,:]*wght[:,:]) """
+# def calc_tr():
+#    global xi,yi,TrailPotential,expdist,z,Weight,Nx,Ny
+#    for xi in range(0,Nx): 
+#        for yi in range(0,Ny):
+#            TrailPotential[xi,yi]=np.sum(expdist[Nx-1-xi:2*Nx-1-xi,Ny-1-yi:2*Ny-1-yi]*z[:,:]*Weight[:,:])
 
 
 # %%
@@ -160,16 +161,17 @@ def calc_tr_new():
 # %%
 timeit.timeit(calc_tr_new,number=1)
 
-
+# %%
+track
 # %%
 # The following is not strictly essential, but it will eliminate
 # a warning.  Comment it out to see the warning.
 #z = ma.masked_where(z <= 0, z)
-#calc_tr()
+#calc_tr_new()
 
 # Automatic selection of levels works; setting the
-# log locator tells contourf to use a log scale:
-cs = plt.contourf(X, Y, tr, levels=np.linspace(tr.min(),tr.max(),1000),cmap=cm.PuBu_r)
+# log locator tells contourf to use a log scale
+cs = plt.contourf(X, Y, TrailPotential, levels=np.linspace(TrailPotential.min(),TrailPotential.max(),1000),cmap=cm.PuBu_r)
 
 # Alternatively, you can manually set the levels
 # and the norm:
@@ -181,8 +183,9 @@ cs = plt.contourf(X, Y, tr, levels=np.linspace(tr.min(),tr.max(),1000),cmap=cm.P
 # The 'extend' kwarg does not work yet with a log scale.
 
 cbar = plt.colorbar()
-plt.scatter(track[0:1999,0],track[0:1999,1])
+
 plt.show()
+plt.scatter(track[0:1999,0],track[0:1999,1])
 
 
 # %%
@@ -207,7 +210,7 @@ def set_up_walker(route_id):
 #Trail gradient
 def setup_potentials():
     global grad,desdirx,desdiry,dest
-    grad=0.002*np.array(np.gradient(tr))
+    grad=0.002*np.array(np.gradient(TrailPotential))
 
     #print (dest)
 #Destination 
@@ -217,9 +220,9 @@ def setup_potentials():
 #def choose_dest()
  #   dest=(random.choice(ends))
 #Destination potential
-    destp=-np.sqrt((dest[0]-x[:,None])**2+(dest[1]-y[None,:])**2)
+    DestinationPotential=-np.sqrt((dest[0]-x[:,None])**2+(dest[1]-y[None,:])**2)
 #Combine gradients
-    grad+=np.array(np.gradient(destp)[:])
+    grad+=np.array(np.gradient(DestinationPotential)[:])
 #Normalise
 #grad[:,:,:]/=(np.sqrt(grad[0,:,:]**2+grad[1,:,:]**2))
     desdirx=ReBiSpline(x,y,grad[0,:,:],s=2)
@@ -251,8 +254,10 @@ def calc_path():
         if (i%samp==0): avpos[:,(i%hist)//samp]=pos[:]
         gradmagnitude=max(0.0001,np.sqrt(desdirx(pos[0],pos[1])**2+desdiry(pos[0],pos[1])**2))
         xi=np.array(np.random.normal(0,1,2))
-        vel[0]+=-1/tau*vel[0]+(dvel/tau)*desdirx(pos[0],pos[1])/gradmagnitude+np.sqrt(2.*eps/tau)*xi[0]
-        vel[1]+=-1/tau*vel[1]+(dvel/tau)*desdiry(pos[0],pos[1])/gradmagnitude+np.sqrt(2.*eps/tau)*xi[1]
+        vel[0]+=-1/tau*vel[0]+desdirx(pos[0],pos[1])/gradmagnitude
+        vel[1]+=-1/tau*vel[1]+desdiry(pos[0],pos[1])/gradmagnitude
+        #vel[0]+=-1/tau*vel[0]+(dvel/tau)*desdirx(pos[0],pos[1])/gradmagnitude+np.sqrt(2.*eps/tau)*xi[0]
+        #vel[1]+=-1/tau*vel[1]+(dvel/tau)*desdiry(pos[0],pos[1])/gradmagnitude+np.sqrt(2.*eps/tau)*xi[1]
         #print (i,pos,vel,(dvel/tau)*desdirx(pos[0],pos[1])/gradmagnitude,(dvel/tau)*desdiry(pos[0],pos[1])/gradmagnitude)
         track[i,:]=pos[:]
         intens[int((pos[0]-xmin)*(Nx-1)/(xmax-xmin)),int((pos[1]-ymin)*(Ny-1)/(ymax-ymin))]+=1.
@@ -273,12 +278,12 @@ def update_ground():
     global q_alpha,intens,z,g_max,t_track,g_nat
     q_alpha=intens*(1.-z/g_max)
 # Time evolution of ground potential
-#    zdiff=(1./t_track)*(g_nat-z)+q_alpha
+    #zdiff=(1./t_track)*(g_nat-z)+q_alpha
     z+=(1./t_track)*(g_nat-z)+q_alpha
-#    cs = plt.contourf(X, Y, zdiff, cmap=cm.PuBu_r)
-#    cbar = plt.colorbar()
-#    plt.show
-#    z[140:160,45:75]
+    #cs = plt.contourf(X, Y, zdiff, cmap=cm.PuBu_r)
+    #cbar = plt.colorbar()
+    #plt.show
+    #z[140:160,45:75]
 
 
 # %%
@@ -313,9 +318,9 @@ plot_path()
 for i in range(0,Nx):
     for j in range(0,Ny):
         if (np.isnan(z[i,j])):
-            print (i,j,g_max[i,j],pic[i,j,0])
+            print (i,j,g_max[i,j],Base[i,j,0])
         
 
 # %%
-g_nat[:,:]-pic[:,:,0]
+g_nat[:,:]-Base[:,:,0]
 z.dtype
