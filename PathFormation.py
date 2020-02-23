@@ -288,7 +288,7 @@ def update_ground():
 
 # %%
 def plot_path():
-    cs = plt.contourf(X, Y, z, levels=np.linspace(z.min(),z.max(),1000),cmap=cm.PuBu_r)
+    cs = plt.contourf(X, Y, z, levels=np.linspace(z.min(),z.max(),1000),cmap='PuBu_r')
     cbar = plt.colorbar()
     plt.scatter(track[0:1999,0],track[0:1999,1],1)
     plt.show
