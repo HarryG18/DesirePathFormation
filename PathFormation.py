@@ -155,7 +155,7 @@ def calc_tr_new():
 #            TrailPotential[xi,yi]=np.sum(expdist[Nx-1-xi:2*Nx-1-xi,Ny-1-yi:2*Ny-1-yi]*z[:,:]*Weight[:,:])
 
 # %%
-#timeit.timeit(calc_tr_new,number=1)
+timeit.timeit(calc_tr_new,number=1)
 
 
 # %%
@@ -179,9 +179,8 @@ cs = plt.contourf(X, Y, TrailPotential, levels=np.linspace(TrailPotential.min(),
 
 cbar = plt.colorbar()
 
-plt.show()
-plt.scatter(track[0:1999,0],track[0:1999,1])
-
+#plt.scatter(track[0:1999,0],track[0:1999,1])
+plt.show(block=False)
 
 # %%
 #set up walker
@@ -248,9 +247,10 @@ def calc_path():
         pos+=dt*vel
         if (i%samp==0): avpos[:,(i%(hist*samp))//samp]=pos[:]
         gradmagnitude=max(0.0001,np.sqrt(desdirx(pos[0],pos[1])**2+desdiry(pos[0],pos[1])**2))
-        #xi=np.array(np.random.normal(0,1,2))
+        xi=np.array(np.random.normal(0,1,2))
         vel[0]+=-1/tau*vel[0]+desdirx(pos[0],pos[1])/gradmagnitude+np.sqrt(2.*eps/tau)*xi[0]
         vel[1]+=-1/tau*vel[1]+desdiry(pos[0],pos[1])/gradmagnitude+np.sqrt(2.*eps/tau)*xi[1]
+        
         #vel[0]+=-1/tau*vel[0]+(dvel/tau)*desdirx(pos[0],pos[1])/gradmagnitude+np.sqrt(2.*eps/tau)*xi[0]
         #vel[1]+=-1/tau*vel[1]+(dvel/tau)*desdiry(pos[0],pos[1])/gradmagnitude+np.sqrt(2.*eps/tau)*xi[1]
         #print (i,pos,vel,(dvel/tau)*desdirx(pos[0],pos[1])/gradmagnitude,(dvel/tau)*desdiry(pos[0],pos[1])/gradmagnitude)
@@ -285,8 +285,8 @@ def update_ground():
 def plot_path():
     plt.contourf(X, Y, z, levels=np.linspace(z.min(),z.max(),1000),cmap='PuBu_r')
     plt.colorbar()
-    plt.scatter(track[0:1999,0],track[0:1999,1],1)
-    plt.show
+    #plt.scatter(track[0:1999,0],track[0:1999,1],1)
+    plt.show(block=False)
     
 
 
@@ -301,7 +301,7 @@ for i in range(0,2):
     for j in range(0,10):
         set_up_walker(np.random.randint(0,len(route)))
         setup_potentials()
-        print (i, start," -> ", dest, pos, calc_path())
+        print(i, start," -> ", dest, pos, calc_path())
     update_ground()
     #plot_path()
 
@@ -320,3 +320,4 @@ for i in range(0,Nx):
 # %%
 g_nat[:,:]-Base[:,:,0]
 z.dtype
+# %%
